@@ -13,6 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { motion } from "framer-motion";
 import { boatService } from '@/services';
 
 const Dashboard = () => {
@@ -111,47 +112,86 @@ const Dashboard = () => {
 
   if (loading && boats.length === 0) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin h-8 w-8 border-4 border-blue-600 rounded-full border-t-transparent"></div>
+      <div className="flex items-center justify-center h-[calc(100vh-64px)]">
+        <div className="loading loading-lg"></div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <motion.div 
+      initial={{ opacity: 0 }} 
+      animate={{ opacity: 1 }} 
+      transition={{ duration: 0.5 }}
+      className="container mx-auto px-4 py-8"
+    >
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-2xl font-bold">Liste des bateaux</h1>
-        <Button onClick={handleAddBoat} className="flex items-center">
-          <PlusIcon className="mr-2 h-4 w-4" />
-          Ajouter un bateau
-        </Button>
+        <motion.h1 
+          initial={{ x: -20, opacity: 0 }} 
+          animate={{ x: 0, opacity: 1 }} 
+          transition={{ delay: 0.2 }}
+          className="text-2xl font-bold"
+        >
+          Liste des bateaux
+        </motion.h1>
+        <motion.div 
+          initial={{ x: 20, opacity: 0 }} 
+          animate={{ x: 0, opacity: 1 }} 
+          transition={{ delay: 0.3 }}
+        >
+          <Button onClick={handleAddBoat} className="flex items-center">
+            <PlusIcon className="mr-2 h-4 w-4" />
+            Ajouter un bateau
+          </Button>
+        </motion.div>
       </div>
 
       {error && (
-        <Alert variant="destructive" className="mb-4">
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <Alert variant="destructive" className="mb-4">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        </motion.div>
       )}
 
       {showForm ? (
-        <div className="mb-8">
+        <motion.div 
+          initial={{ opacity: 0 }} 
+          animate={{ opacity: 1 }} 
+          transition={{ duration: 0.3 }}
+          className="mb-8"
+        >
           <BoatForm
             boat={selectedBoat || undefined}
             onSubmit={handleSubmit}
             onCancel={handleCancelForm}
             validationErrors={validationErrors}
           />
-        </div>
+        </motion.div>
       ) : (
         boats.length === 0 ? (
-          <div className="text-center py-12 bg-gray-50 rounded-lg">
-            <p className="text-gray-500">Aucun bateau à afficher</p>
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3 }}
+            className="text-center py-12 bg-card rounded-lg border border-border"
+          >
+            <p className="text-muted-foreground">Aucun bateau à afficher</p>
             <Button onClick={handleAddBoat} variant="link" className="mt-2">
               Ajouter votre premier bateau
             </Button>
-          </div>
+          </motion.div>
         ) : (
-          <div className="rounded-md border">
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+            className="rounded-md border border-border"
+          >
             <Table>
               <TableHeader>
                 <TableRow>
@@ -161,11 +201,14 @@ const Dashboard = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {boats.map((boat) => (
-                  <TableRow 
+                {boats.map((boat, index) => (
+                  <motion.tr 
                     key={boat.id} 
-                    className="cursor-pointer hover:bg-muted/50"
+                    className="cursor-pointer hover:bg-muted/50 transition-colors duration-200"
                     onClick={() => handleRowClick(boat)}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.05, duration: 0.3 }}
                   >
                     <TableCell className="font-medium">{boat.name}</TableCell>
                     <TableCell className="truncate max-w-[400px] break-all break-words">{boat.description}</TableCell>
@@ -178,6 +221,7 @@ const Dashboard = () => {
                             e.stopPropagation();
                             handleEditBoat(boat);
                           }}
+                          className="hover:bg-muted transition-colors duration-200"
                         >
                           <Pencil1Icon className="h-4 w-4" />
                           <span className="sr-only">Modifier</span>
@@ -189,22 +233,23 @@ const Dashboard = () => {
                             e.stopPropagation();
                             handleDeleteBoat(boat.id);
                           }}
+                          className="transition-colors duration-200"
                         >
                           <TrashIcon className="h-4 w-4" />
                           <span className="sr-only">Supprimer</span>
                         </Button>
                       </div>
                     </TableCell>
-                  </TableRow>
+                  </motion.tr>
                 ))}
               </TableBody>
             </Table>
-          </div>
+          </motion.div>
         )
       )}
 
       <Dialog open={showDetailDialog} onOpenChange={setShowDetailDialog}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md bg-card">
           <DialogHeader>
             <DialogTitle>{selectedBoat?.name}</DialogTitle>
             <DialogDescription>
@@ -222,11 +267,11 @@ const Dashboard = () => {
                 <div className="space-y-2 mt-4">
                   <h4 className="font-medium text-sm">Description</h4>
                   <div className="max-h-[120px] overflow-y-auto pr-2">
-                    <p className="text-sm text-gray-700 break-all break-words">{selectedBoat.description}</p>
+                    <p className="text-sm text-muted-foreground break-all break-words">{selectedBoat.description}</p>
                   </div>
                 </div>
               </div>
-              <div className="border-t pt-4 mt-4">
+              <div className="border-t border-border pt-4 mt-4">
                 <div className="flex justify-end gap-2">
                   <Button 
                     variant="outline" 
@@ -248,7 +293,7 @@ const Dashboard = () => {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+    </motion.div>
   );
 };
 

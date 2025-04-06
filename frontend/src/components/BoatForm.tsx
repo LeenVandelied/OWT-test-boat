@@ -4,6 +4,8 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ValidationErrors } from '@/types/api';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { motion } from 'framer-motion';
+
 interface BoatFormProps {
   boat?: Boat;
   onSubmit: (boat: Omit<Boat, 'id'> | Boat) => void;
@@ -94,61 +96,105 @@ export const BoatForm = ({ boat, onSubmit, onCancel, validationErrors }: BoatFor
   const isDescriptionTooLong = charactersLeft < 0;
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle>{isEditMode ? 'Modifier le bateau' : 'Ajouter un bateau'}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <label htmlFor="name" className="text-sm font-medium">
-              Nom
-            </label>
-            <Input
-              id="name"
-              name="name"
-              required
-              value={formData.name}
-              onChange={handleInputChange}
-              placeholder="Nom du bateau"
-              className={errors.name ? "border-red-500" : ""}
-            />
-            {errors.name && (
-              <p className="text-red-500 text-sm mt-1">{errors.name}</p>
-            )}
-          </div>
-          <div className="space-y-2">
-            <label htmlFor="description" className="text-sm font-medium">
-              Description
-            </label>
-            <div className="relative">
-              <textarea
-                id="description"
-                name="description"
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+    >
+      <Card className="w-full border-border bg-card">
+        <CardHeader>
+          <CardTitle>{isEditMode ? 'Modifier le bateau' : 'Ajouter un bateau'}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <motion.div 
+              className="space-y-2"
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.1, duration: 0.3 }}
+            >
+              <label htmlFor="name" className="text-sm font-medium">
+                Nom
+              </label>
+              <Input
+                id="name"
+                name="name"
                 required
-                className={`flex h-20 w-full rounded-md border ${isDescriptionTooLong || errors.description ? 'border-red-500' : 'border-gray-300'} bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2`}
-                value={formData.description}
+                value={formData.name}
                 onChange={handleInputChange}
-                placeholder="Description du bateau"
+                placeholder="Nom du bateau"
+                className={`${errors.name ? "border-red-500" : "border-border"} bg-background`}
               />
-              <div className={`text-sm mt-1 text-right ${isDescriptionTooLong ? 'text-red-500 font-medium' : 'text-gray-500'}`}>
-                {charactersLeft} caractères restants
+              {errors.name && (
+                <motion.p 
+                  className="text-red-500 text-sm mt-1"
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  {errors.name}
+                </motion.p>
+              )}
+            </motion.div>
+            <motion.div 
+              className="space-y-2"
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2, duration: 0.3 }}
+            >
+              <label htmlFor="description" className="text-sm font-medium">
+                Description
+              </label>
+              <div className="relative">
+                <textarea
+                  id="description"
+                  name="description"
+                  required
+                  className={`flex h-20 w-full rounded-md border ${
+                    isDescriptionTooLong || errors.description 
+                      ? 'border-red-500' 
+                      : 'border-border'
+                  } bg-background text-foreground px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2`}
+                  value={formData.description}
+                  onChange={handleInputChange}
+                  placeholder="Description du bateau"
+                />
+                <div className={`text-sm mt-1 text-right ${
+                  isDescriptionTooLong 
+                    ? 'text-red-500 font-medium' 
+                    : 'text-muted-foreground'
+                }`}>
+                  {charactersLeft} caractères restants
+                </div>
               </div>
-            </div>
-            {errors.description && (
-              <p className="text-red-500 text-sm mt-1">{errors.description}</p>
-            )}
-          </div>
-        </form>
-      </CardContent>
-      <CardFooter className="flex justify-between">
-        <Button variant="ghost" onClick={onCancel}>
-          Annuler
-        </Button>
-        <Button onClick={handleSubmit} disabled={isDescriptionTooLong}>
-          {isEditMode ? 'Enregistrer' : 'Ajouter'}
-        </Button>
-      </CardFooter>
-    </Card>
+              {errors.description && (
+                <motion.p 
+                  className="text-red-500 text-sm mt-1"
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  {errors.description}
+                </motion.p>
+              )}
+            </motion.div>
+          </form>
+        </CardContent>
+        <CardFooter className="flex justify-between border-t border-border pt-4">
+          <Button 
+            variant="outline" 
+            onClick={onCancel}
+          >
+            Annuler
+          </Button>
+          <motion.div whileTap={{ scale: 0.98 }}>
+            <Button 
+              onClick={handleSubmit} 
+              disabled={isDescriptionTooLong}
+            >
+              {isEditMode ? 'Enregistrer' : 'Ajouter'}
+            </Button>
+          </motion.div>
+        </CardFooter>
+      </Card>
+    </motion.div>
   );
 }; 
