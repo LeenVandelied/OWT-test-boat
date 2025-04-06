@@ -9,7 +9,7 @@ const AppRoutes = () => {
   const { isAuthenticated } = useAuth();
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background text-foreground">
       <Header />
       <Routes>
         <Route path="/login" element={
