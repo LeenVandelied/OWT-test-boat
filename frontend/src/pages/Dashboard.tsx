@@ -75,12 +75,10 @@ const Dashboard = () => {
     setValidationErrors(null);
     try {
       if ('id' in boat) {
-        // Mise à jour d'un bateau existant
         const updatedBoat = await boatService.update(boat.id, boat as Boat);
         setBoats(boats.map(b => (b.id === updatedBoat.id ? updatedBoat : b)));
         setShowForm(false);
       } else {
-        // Création d'un nouveau bateau
         const newBoat = await boatService.create(boat);
         setBoats([...boats, newBoat]);
         setShowForm(false);
@@ -89,7 +87,6 @@ const Dashboard = () => {
       const apiError = err as ApiError;
       setError(apiError.message || 'Erreur lors de l\'enregistrement du bateau');
       
-      // Si nous avons des erreurs de validation, les stocker pour les afficher dans le formulaire
       if (apiError.validationErrors) {
         setValidationErrors(apiError.validationErrors);
       }
