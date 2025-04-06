@@ -1,8 +1,13 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
+import { useEffect } from 'react';
 
 export const ProtectedRoute = () => {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, loading, checkAuthStatus } = useAuth();
+  
+  useEffect(() => {
+    checkAuthStatus();
+  }, [checkAuthStatus]);
 
   if (loading) {
     return (
@@ -11,6 +16,6 @@ export const ProtectedRoute = () => {
       </div>
     );
   }
-
+  
   return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />;
 }; 
