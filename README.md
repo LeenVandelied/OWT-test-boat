@@ -1,5 +1,12 @@
 # Boat Manager
 
+## Introduction et retour du test
+
+Voici le test réalisé pour OWT.
+Je tiens à faire mes remarques avant une potentielle relecture. C'est pour une fois un test "agréable" qui corresponds au travail d'un développeur. La mise en place d'une API et d'une liste est toujours plus intéressant à développer qu'un tests codingame et je vous en remercie.
+Ma seule réserve c'est toujours lié à la taille et à la complexité attendue. J'ai fais un développement qui me semble pertinent pour l'exercice. Ni trop gros, ni trop petit, il y a toujours des améliorations à apporter mais je ne voulais pas en faire trop.
+Je serais donc ravi d'échanger sur les choix pris lors d'une prochaine rencontre !
+
 ## Français
 
 J'ai développé cette application de gestion de bateaux avec une architecture hexagonale en Spring Boot pour le backend et React pour le frontend dans le cadre de ce test technique.
