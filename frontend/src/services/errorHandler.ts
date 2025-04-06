@@ -10,7 +10,19 @@ export const handleApiError = (error: unknown): never => {
     };
 
     if (axiosError.response) {
-      if (axiosError.response.status === 400 && typeof axiosError.response.data === 'object') {
+      const isLoginEndpoint = axiosError.config?.url?.includes('/login');
+      
+      if (axiosError.response.status === 401) {
+        if (isLoginEndpoint) {
+          apiError.message = 'Identifiant ou mot de passe incorrect';
+        } else {
+          apiError.message = 'Votre session a expiré, veuillez vous reconnecter';
+        }
+      }
+      else if (axiosError.response.status === 403) {
+        apiError.message = 'Vous n\'avez pas les droits nécessaires pour cette action';
+      }
+      else if (axiosError.response.status === 400 && typeof axiosError.response.data === 'object') {
         apiError.message = 'Veuillez corriger les erreurs de validation';
         apiError.validationErrors = axiosError.response.data as ValidationErrors;
       } 

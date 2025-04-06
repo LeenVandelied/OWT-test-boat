@@ -1,88 +1,85 @@
-import { useState } from 'react';
+import { FormEvent, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { LoginRequest } from '@/types/auth';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { LoginRequest } from '@/types/auth';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { ApiError } from '@/types/api';
 
 const Login = () => {
-  const [credentials, setCredentials] = useState<LoginRequest>({
-    username: '',
-    password: '',
-  });
-  const [error, setError] = useState('');
-  const { login } = useAuth();
   const navigate = useNavigate();
+  const { login, isAuthenticated } = useAuth();
+  const [credentials, setCredentials] = useState<LoginRequest>({ username: '', password: '' });
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setCredentials((prev) => ({ ...prev, [name]: value }));
-  };
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/');
+    }
+  }, [isAuthenticated, navigate]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError(null);
+    setLoading(true);
     
     try {
       await login(credentials);
       navigate('/');
-    } catch {
-      setError('Nom d\'utilisateur ou mot de passe incorrect');
+    } catch (err: unknown) {
+      const apiError = err as ApiError;
+      setError(apiError.message || 'Erreur lors de la connexion');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <Card className="w-full max-w-md mx-4">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">Connexion</CardTitle>
-          <CardDescription className="text-center">
-            Entrez vos identifiants pour accéder à l'application
-          </CardDescription>
+    <div className="flex items-center justify-center h-screen bg-gray-50">
+      <Card className="w-[400px] shadow-md">
+        <CardHeader>
+          <CardTitle>Connexion</CardTitle>
+          <CardDescription>Accédez à votre espace de gestion de bateaux</CardDescription>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <label htmlFor="username" className="text-sm font-medium">
-                Nom d'utilisateur
-              </label>
-              <Input
-                id="username"
-                name="username"
-                placeholder="admin"
-                required
-                value={credentials.username}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div className="space-y-2">
-              <label htmlFor="password" className="text-sm font-medium">
-                Mot de passe
-              </label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                placeholder="••••••••"
-                required
-                value={credentials.password}
-                onChange={handleInputChange}
-              />
-            </div>
+        <form onSubmit={handleSubmit}>
+          <CardContent>
             {error && (
-              <div className="text-sm font-medium text-red-500">{error}</div>
+              <Alert variant="destructive" className="mb-4">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
             )}
-          </form>
-        </CardContent>
-        <CardFooter>
-          <Button 
-            className="w-full" 
-            onClick={handleSubmit}
-          >
-            Se connecter
-          </Button>
-        </CardFooter>
+            <div className="grid gap-4">
+              <div className="grid gap-2">
+                <label htmlFor="username">Nom d'utilisateur</label>
+                <Input
+                  id="username"
+                  type="text"
+                  value={credentials.username}
+                  onChange={(e) => setCredentials({ ...credentials, username: e.target.value })}
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <label htmlFor="password">Mot de passe</label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={credentials.password}
+                  onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
+                  required
+                />
+              </div>
+            </div>
+          </CardContent>
+          <CardFooter>
+            <Button className="w-full" type="submit" disabled={loading}>
+              {loading ? 'Connexion en cours...' : 'Se connecter'}
+            </Button>
+          </CardFooter>
+        </form>
       </Card>
     </div>
   );

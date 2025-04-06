@@ -7,6 +7,7 @@ interface AuthContextType {
   login: (credentials: LoginRequest) => Promise<void>;
   logout: () => void;
   loading: boolean;
+  checkAuthStatus: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -15,14 +16,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
 
+  const checkAuthStatus = () => {
+    const auth = authService.isAuthenticated();
+    setIsAuthenticated(auth);
+    setLoading(false);
+  };
+
   useEffect(() => {
-    const checkAuth = () => {
-      const auth = authService.isAuthenticated();
-      setIsAuthenticated(auth);
-      setLoading(false);
-    };
+    checkAuthStatus();
     
-    checkAuth();
+    const intervalId = setInterval(checkAuthStatus, 5 * 60 * 1000);
+    return () => clearInterval(intervalId);
   }, []);
 
   const login = async (credentials: LoginRequest) => {
@@ -41,7 +45,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout, loading }}>
+    <AuthContext.Provider value={{ isAuthenticated, login, logout, loading, checkAuthStatus }}>
       {children}
     </AuthContext.Provider>
   );
